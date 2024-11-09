@@ -1,48 +1,123 @@
-import numpy as np
+"""import numpy as np
 
+def add_intercept_column(X):
+
+    #Agrega una columna de unos a la matriz X para incluir el término independiente en el modelo.
+
+    n = X.shape[0]
+    intercept = np.ones((n, 1))  # Columna de unos
+    return np.hstack((intercept, X))  # Concatenamos la columna de unos a X
+
+def check_conditions(X, y):
+    n, p = X.shape
+    if n < p:
+        raise ValueError("El número de observaciones debe ser mayor o igual al número de variables predictoras (n >= p).")
+    if np.linalg.matrix_rank(X) < p:
+        raise ValueError("Las columnas de X deben ser linealmente independientes (rango completo).")
+    if y.shape[0] != n:
+        raise ValueError("El vector y debe tener el mismo número de filas que X.")
+    print("Todas las condiciones se cumplen.")
+    return True
 
 def gram_schmidt(X):
-    # Aplicamos el proceso de Gram-Schmidt a la matriz X para obtener Q y R
-    n, m = X.shape
-    Q = np.zeros((n, m))
-    R = np.zeros((m, m))
-
-    for j in range(m):
-        v = X[:, j]
+    n, p = X.shape
+    Q = np.zeros((n, p))
+    for j in range(p):
+        q = X[:, j]
         for i in range(j):
-            R[i, j] = np.dot(Q[:, i], X[:, j])
-            v = v - R[i, j] * Q[:, i]
-        R[j, j] = np.linalg.norm(v)
-        if R[j, j] == 0:
-            raise ValueError(
-                "Las columnas de la matriz X son linealmente dependientes o contienen una columna de ceros.")
-        Q[:, j] = v / R[j, j]
+            q = q - np.dot(Q[:, i], X[:, j]) * Q[:, i]
+        Q[:, j] = q / np.linalg.norm(q)
+    return Q
 
-    return Q, R
-
-
-def linear_regression_gs(X, y):
-    # Asegurarse de que X y y tienen dimensiones compatibles
-    if X.shape[0] != y.shape[0]:
-        raise ValueError("El número de filas de X debe ser igual al tamaño de y.")
-
-    # Añadir una columna de unos a X para el término independiente
-    X = np.hstack((np.ones((X.shape[0], 1)), X))
-
-    # Obtener las matrices Q y R mediante Gram-Schmidt
-    Q, R = gram_schmidt(X)
-
-    # Calcular Q^T * y
-    Qt_y = np.dot(Q.T, y)
-
-    # Resolver R * beta = Q^T * y mediante sustitución hacia atrás
-    beta = np.zeros(R.shape[1])
-    for i in range(R.shape[1] - 1, -1, -1):
-        if R[i, i] == 0:
-            raise ValueError("La matriz R es singular, no se puede resolver el sistema.")
-        beta[i] = (Qt_y[i] - np.dot(R[i, i + 1:], beta[i + 1:])) / R[i, i]
-
+def regression_coefficients(X, y):
+    check_conditions(X, y)
+    Q = gram_schmidt(X)
+    beta = np.dot(Q.T, y) / np.sum(Q**2, axis=0)
     return beta
 
+def calculate_errors(X, y, beta):
+    y_pred = X @ beta
+    mse = np.mean((y - y_pred) ** 2)
+    ss_total = np.sum((y - np.mean(y)) ** 2)
+    ss_residual = np.sum((y - y_pred) ** 2)
+    r2 = 1 - (ss_residual / ss_total)
+    return mse, r2
 
+
+def print_regression_equation(beta, include_intercept=True):
+
+    #Imprime la ecuación de regresión en formato legible.
+
+    equation = "y = "
+    if include_intercept:
+        # El primer coeficiente es el intercepto
+        equation += f"{beta[0]:.4f} "
+        start = 1
+    else:
+        start = 0
+
+    for i in range(start, len(beta)):
+        sign = "+" if beta[i] >= 0 else "-"
+        equation += f"{sign} {abs(beta[i]):.4f} * x{i}"
+        if i < len(beta) - 1:
+            equation += " "
+
+    print("Ecuación de regresión:", equation)"""
+import numpy as np
+
+def add_intercept_column(X):
+    n = X.shape[0]
+    intercept = np.ones((n, 1), dtype=np.float64)  # Aseguramos precisión con np.float64
+    return np.hstack((intercept, X.astype(np.float64)))  # Convertimos X a np.float64
+
+def check_conditions(X, y):
+    n, p = X.shape
+    if n < p:
+        raise ValueError("El número de observaciones debe ser mayor o igual al número de variables predictoras (n >= p).")
+    if np.linalg.matrix_rank(X) < p:
+        raise ValueError("Las columnas de X deben ser linealmente independientes (rango completo).")
+    if y.shape[0] != n:
+        raise ValueError("El vector y debe tener el mismo número de filas que X.")
+    print("Todas las condiciones se cumplen.")
+    return True
+
+def gram_schmidt(X):
+    n, p = X.shape
+    Q = np.zeros((n, p), dtype=np.float64)  # Aseguramos precisión con np.float64
+    for j in range(p):
+        q = X[:, j].astype(np.float64)
+        for i in range(j):
+            q = q - np.dot(Q[:, i], X[:, j]) * Q[:, i]
+        Q[:, j] = q / np.linalg.norm(q)
+    return Q
+
+def regression_coefficients(X, y):
+    check_conditions(X, y)
+    Q = gram_schmidt(X)
+    beta = np.dot(Q.T, y.astype(np.float64)) / np.sum(Q**2, axis=0)
+    return beta
+
+def calculate_errors(X, y, beta):
+    y_pred = X @ beta
+    mse = np.mean((y.astype(np.float64) - y_pred) ** 2)
+    ss_total = np.sum((y.astype(np.float64) - np.mean(y)) ** 2)
+    ss_residual = np.sum((y.astype(np.float64) - y_pred) ** 2)
+    r2 = 1 - (ss_residual / ss_total)
+    return mse, r2
+
+def print_regression_equation(beta, include_intercept=True):
+    equation = "y = "
+    if include_intercept:
+        equation += f"{beta[0]:.4f} "
+        start = 1
+    else:
+        start = 0
+
+    for i in range(start, len(beta)):
+        sign = "+" if beta[i] >= 0 else "-"
+        equation += f"{sign} {abs(beta[i]):.4f} * x{i}"
+        if i < len(beta) - 1:
+            equation += " "
+
+    print("Ecuación de regresión:", equation)
 
