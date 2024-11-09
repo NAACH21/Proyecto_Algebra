@@ -1,25 +1,51 @@
 import numpy as np
 
-def svd_linear_regression_regularized(X, y, alpha=1e-10):
-    # Agrega una columna de unos para el término independiente
+def check_conditions_svd(X, y):
+    n, p = X.shape
+    if y.shape[0] != n:
+        raise ValueError("El vector y debe tener el mismo número de filas que X.")
+    print("Condiciones de formato se cumplen.")
+
+def regression_coefficients_svd2(X, Y):
+    check_conditions_svd(X, Y)
+    # Agregar la columna de unos para el intercepto
     X = np.hstack((np.ones((X.shape[0], 1)), X))
 
-    # Descomposición en valores singulares (SVD)
-    U, S, Vt = np.linalg.svd(X, full_matrices=False)
+    # Descomposición SVD de X
+    U, s, Vt = np.linalg.svd(X, full_matrices=False)
 
-    # Aplica regularización
-    S_reg = S / (S ** 2 + alpha)  # Regularización de los valores singulares
+    # Invertir los valores singulares
+    S_inv = np.diag(1 / s)
 
-    # Calcula los coeficientes
-    beta = Vt.T @ np.diag(S_reg) @ U.T @ y
-
+    # Calcular los coeficientes beta
+    beta = Vt.T @ S_inv @ U.T @ Y
     return beta
 
+def calculate_errors2(X, Y, beta):
+    # Asegurarse de que X tenga la columna de unos (intercepto)
+    X = np.hstack((np.ones((X.shape[0], 1)), X))
 
-if __name__ == '__main__':
-    # Ejemplo de uso
-    X = np.array([[1, 2], [2, 4], [3, 6], [4, 8]])
-    y = np.array([3, 5, 7, 9])
+    # Predicciones de Y
+    Y_pred = X @ beta
 
-    coeficientes = svd_linear_regression_regularized(X, y)
-    print("Coeficientes de regresión (SVD Regularizado):", coeficientes)
+    # Error cuadrático medio
+    mse = np.mean((Y - Y_pred) ** 2)
+
+    # Coeficiente de determinación R^2
+    ss_total = np.sum((Y - np.mean(Y)) ** 2)
+    ss_residual = np.sum((Y - Y_pred) ** 2)
+    r2 = 1 - (ss_residual / ss_total)
+
+    return mse, r2
+
+def print_regression_equation2(beta, include_intercept=True):
+    equation = "Y = "
+    if include_intercept:
+        equation += f"{beta[0]:.4f} "
+        for i, b in enumerate(beta[1:], start=1):
+            equation += f"+ ({b:.4f}) * X{i} "
+    else:
+        for i, b in enumerate(beta, start=1):
+            equation += f"({b:.4f}) * X{i} "
+
+    print("Ecuación de regresión:", equation)
