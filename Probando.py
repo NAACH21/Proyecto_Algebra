@@ -10,11 +10,11 @@ if __name__ == '__main__':
     np.random.seed(0)
 
     # Generar 100 observaciones para 5 variables independientes (regresores)
-    X1 = np.random.normal(0, 1, 1000000)
-    X2 = np.random.normal(0, 1, 1000000)
-    X3 = np.random.normal(0, 1, 1000000)
-    X4 = np.random.normal(0, 1, 1000000)
-    X5 = np.random.normal(0, 1, 1000000)
+    X1 = np.random.normal(0, 1, 100)
+    X2 = np.random.normal(0, 1, 100)
+    X3 = np.random.normal(0, 1, 100)
+    X4 = np.random.normal(0, 1, 100)
+    X5 = np.random.normal(0, 1, 100)
 
     # Definir los coeficientes reales
     beta_0 = 2
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     beta_5 = -1
 
     # Generar el término de error
-    epsilon = np.random.normal(0, 1, 1000000)
+    epsilon = np.random.normal(0, 1, 100)
 
     # Calcular la variable dependiente Y
     Y = beta_0 + beta_1 * X1 + beta_2 * X2 + beta_3 * X3 + beta_4 * X4 + beta_5 * X5 + epsilon
