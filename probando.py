@@ -1,4 +1,5 @@
-from DSV import *
+#from DSV import *
+from Triangulacion import *
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -57,11 +58,11 @@ if __name__ == '__main__':
     #X_with_intercept = add_intercept_column(X_standardized[:, :3])  # Usamos solo las 3 primeras variables
 
     try:
-        beta = regression_coefficients_svd2(x_2, y_2)
-        mse, r2 = calculate_errors2(x_2, y_2, beta)
+        beta = regression_coefficients_householder(x_2, y_2)
+        mse, r2 = calculate_errors_householder(x_2, y_2, beta)
         print("Coeficientes de regresión (incluyendo intercepto):", beta)
         print("Error cuadrático medio (MSE):", mse)
         print("Coeficiente de determinación (R^2):", r2)
-        print_regression_equation2(beta, include_intercept=True)
+        print_regression_equation(beta, include_intercept=True)
     except ValueError as e:
         print("Error:", e)
