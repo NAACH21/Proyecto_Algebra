@@ -1,5 +1,4 @@
 from GramSchmidt import *
-from TriangulaciónHouseholder import *
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
