@@ -18,6 +18,20 @@ def verificarSimetriaPositiva(matriz):
 #acá devuele la matris L de  X=L*LT
 def descomposicionCholesky(matriz):
     return np.linalg.cholesky(matriz)
+def calculate_errors(X, y, beta):
+    y_pred = X @ beta
+    mse = np.mean((y.astype(np.float64) - y_pred) ** 2)
+    ss_total = np.sum((y.astype(np.float64) - np.mean(y)) ** 2)
+    ss_residual = np.sum((y.astype(np.float64) - y_pred) ** 2)
+    r2 = 1 - (ss_residual / ss_total)
+    return mse, r2
+def print_regression_equation(beta, include_intercept=True):
+    equation = "y = "
+    if include_intercept:
+        equation += f"{beta[0]:.4f} "
+        start = 1
+    else:
+        start = 0
 
 # resuelve un sistema de ecuaciones usando la descomposición de Cholesky
 # resuelve L*y_intermedio = b, luego L^T*x = y_intermedio y obtiene x
